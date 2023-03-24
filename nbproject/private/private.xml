@@ -2,6 +2,12 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/D:/Documents/MrNaina/S4/Framework/src/java/etu2023/framework/servlet/FrontServlet.java</file>
+            <file>file:/D:/Documents/MrNaina/S4/Framework/src/java/etu2023/framework/Mapping.java</file>
+            <file>file:/D:/Documents/MrNaina/S4/Framework/src/java/etu2023/framework/model/Personne.java</file>
+            <file>file:/D:/Documents/MrNaina/S4/Framework/src/java/etu2023/framework/utils/Utils.java</file>
+            <file>file:/D:/Documents/MrNaina/S4/Framework/src/java/etu2023/framework/annotation/Annotation.java</file>
+        </group>
     </open-files>
 </project-private>

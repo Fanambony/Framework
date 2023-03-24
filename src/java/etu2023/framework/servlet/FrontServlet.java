@@ -6,13 +6,20 @@ package etu2023.framework.servlet;
  */
 
 import etu2023.framework.Mapping;
+import etu2023.framework.annotation.Annotation;
+import etu2023.framework.model.Personne;
+import etu2023.framework.utils.Utils;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  *
@@ -30,6 +37,39 @@ public class FrontServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     HashMap<String, Mapping> MappingUrls;
+    
+    public HashMap<String, Mapping> getMappingUrls() {
+        return MappingUrls;
+    }
+
+    public void setMappingUrls(HashMap<String, Mapping> MappingUrls) {
+        this.MappingUrls = MappingUrls;
+    }
+    
+    public void setMappingUrls(String path) {
+        try {
+            List<Class> lc = Utils.getClassFrom(path);
+            setMappingUrls(new HashMap<String, Mapping>());
+            for (Class c : lc) {
+                for (Method m : c.getDeclaredMethods()) {
+                    Annotation u = m.getAnnotation(Annotation.class);
+                    if (u != null) {
+                       getMappingUrls().put(u.value() , new Mapping(c.getSimpleName(), m.getName()));
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+
+    @Override
+    public void init() throws ServletException {
+        super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        setMappingUrls("etu2023.framework.model.");
+    }
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -44,9 +84,23 @@ public class FrontServlet extends HttpServlet {
             out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
             out.println("<h1>" +request.getRequestURI() + "</h1>");
             out.println("<h1>"+getNom(request, response) + "</h1>");
+            
+            Method m = getMethodFromUrl(getNom(request, response));
+            m.invoke(new Personne(),null);
+//            out.println(getMappingUrls().size());
+            for (Map.Entry<String, Mapping> entry : MappingUrls.entrySet()) {
+                Object key = entry.getKey();
+                Object val = entry.getValue();
+//                out.println(key);
+            }
+//            out.println(getMethodFromUrl(getNom(request, response)).getName());
+
             out.println("</body>");
             out.println("</html>");
             
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -94,10 +148,21 @@ public class FrontServlet extends HttpServlet {
         String path = request.getContextPath();
         String uri = request.getRequestURI();
         result = uri.split(path )[1];
-        String query = request.getQueryString();
-        if(query!=null){
-            result = result.concat("?"+ query);
-        }
         return result;
+    }
+    
+    public Method getMethodFromUrl(String url) throws Exception {
+        
+        List<Class> lc = Utils.getClassFrom("etu2023.framework.model.");
+        for (Class c : lc) {
+            if (c.getSimpleName() == getMappingUrls().get(url).getClassName()){
+                for (Method m : c.getDeclaredMethods()) {
+                    if (m.getName() == getMappingUrls().get(url).getMethod()){
+                        return m;
+                    }
+                }
+            }
+        }
+        throw new Exception("Method not found");
     }
 }
