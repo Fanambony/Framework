@@ -11,4 +11,17 @@ package etu2023.framework;
 public class Mapping {
     String className;
     String Method;
+
+    public String getClassName() {
+        return this.className;
+    }
+
+    public String getMethod() {
+        return this.Method;
+    }
+
+    public Mapping(String className, String Method) {
+        this.className = className;
+        this.Method = Method;
+    }
 }
