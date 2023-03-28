@@ -38,7 +38,7 @@ public class FrontServlet extends HttpServlet {
      */
     HashMap<String, Mapping> MappingUrls;
     
-    private ArrayList<Class> classList;
+    private ArrayList<Class> classList = new ArrayList<>();
 
     public ArrayList<Class> getClassList() {
         return classList;
@@ -66,9 +66,10 @@ public class FrontServlet extends HttpServlet {
                 for (Method m : c.getDeclaredMethods()) {
                     Annotation u = m.getAnnotation(Annotation.class);
                     if (u != null) {
-                       getMappingUrls().put(u.value() , new Mapping(c.getSimpleName(), m.getName()));
+                        getMappingUrls().put(u.value() , new Mapping(c.getSimpleName(), m.getName()));
                     }
                 }
+                getClassList().add(c);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -90,25 +91,25 @@ public class FrontServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet FrontServlet</title>");            
+            out.println("<title>Servlet FrontServlet</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
             out.println("<h1>" +request.getRequestURI() + "</h1>");
             out.println("<h1>"+getNom(request, response) + "</h1>");
             
+            out.println("tiavina"); 
             Method m = getMethodFromUrl(getNom(request, response));
             Class c = getClass(getNom(request, response));
             Object o = m.invoke(c.newInstance(),null);
-            
+            out.println("tiavina    ");
 //            out.println(getMappingUrls().size());
             for (Map.Entry<String, Mapping> entry : MappingUrls.entrySet()) {
                 Object key = entry.getKey();
                 Object val = entry.getValue();
-//                out.println(key);
             }
 //            out.println(getMethodFromUrl(getNom(request, response)).getName());
-
+    
             out.println("</body>");
             out.println("</html>");
             
