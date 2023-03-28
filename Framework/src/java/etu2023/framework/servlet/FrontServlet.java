@@ -86,7 +86,15 @@ public class FrontServlet extends HttpServlet {
             out.println("<h1>"+getNom(request, response) + "</h1>");
             
             Method m = getMethodFromUrl(getNom(request, response));
-            m.invoke(new Personne(),null);
+
+            Class c = getClass(getNom(request, response));
+            Object o = m.invoke(c.newInstance(),null);
+            
+//            if(o instanceof ModelView){
+//                ModelView mv = (ModelView)o;
+//                RequestDispatcher rd = request.getRe
+//            }
+            
 //            out.println(getMappingUrls().size());
             for (Map.Entry<String, Mapping> entry : MappingUrls.entrySet()) {
                 Object key = entry.getKey();
