@@ -7,7 +7,6 @@ package etu2023.framework.servlet;
 
 import etu2023.framework.Mapping;
 import etu2023.framework.annotation.Annotation;
-import etu2023.framework.model.Personne;
 import etu2023.framework.utils.Utils;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,6 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +37,18 @@ public class FrontServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     HashMap<String, Mapping> MappingUrls;
+    
+    private ArrayList<Class> classList;
+
+    public ArrayList<Class> getClassList() {
+        return classList;
+    }
+
+    public void setClassList(ArrayList<Class> classList) {
+        this.classList = classList;
+    }
+    
+    
     
     public HashMap<String, Mapping> getMappingUrls() {
         return MappingUrls;
@@ -86,7 +98,9 @@ public class FrontServlet extends HttpServlet {
             out.println("<h1>"+getNom(request, response) + "</h1>");
             
             Method m = getMethodFromUrl(getNom(request, response));
-            m.invoke(new Personne(),null);
+            Class c = getClass(getNom(request, response));
+            Object o = m.invoke(c.newInstance(),null);
+            
 //            out.println(getMappingUrls().size());
             for (Map.Entry<String, Mapping> entry : MappingUrls.entrySet()) {
                 Object key = entry.getKey();
@@ -164,5 +178,19 @@ public class FrontServlet extends HttpServlet {
             }
         }
         throw new Exception("Method not found");
+    }
+    
+    public Class getClass(String url) throws Exception{
+        List<Class> lc = getClassList();
+        for(Class c : lc){
+            if(c.getSimpleName().equals(getMappingUrls().get(url).getClassName())) {
+                for(Method m : c.getDeclaredMethods()){
+                    if(m.getName().equals(getMappingUrls().get(url).getMethod())) {
+                        return c;
+                    }
+                }
+            }
+        }
+        throw new Exception("Class not found");
     }
 }
