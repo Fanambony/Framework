@@ -4,6 +4,7 @@
  */
 package etu2023.framework.model;
 
+import etu2023.framework.ModelView;
 import etu2023.framework.annotation.Annotation;
 
 /**
@@ -25,9 +26,10 @@ public class Personne {
     }
 
     @Annotation(value = "/prenom")
-    public String getPrenom() {
+    public ModelView getPrenom() {
         System.out.println("Mon prenom");
-        return prenom;
+        ModelView modelView = new ModelView("index.jsp");
+        return modelView;
     }
 
     public void setPrenom() {
