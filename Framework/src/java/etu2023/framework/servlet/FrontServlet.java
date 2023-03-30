@@ -106,9 +106,16 @@ public class FrontServlet extends HttpServlet {
             
             if(o instanceof ModelView){
                 ModelView mv = (ModelView)o;
+<<<<<<< Updated upstream
                 RequestDispatcher dispather = request.getRequestDispatcher(mv.getView());
                 dispather.forward(request, response);
             }
+=======
+                RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
+                rd.forward(request, response);
+            }
+            
+>>>>>>> Stashed changes
 //            out.println(getMappingUrls().size());
             for (Map.Entry<String, Mapping> entry : MappingUrls.entrySet()) {
                 Object key = entry.getKey();
