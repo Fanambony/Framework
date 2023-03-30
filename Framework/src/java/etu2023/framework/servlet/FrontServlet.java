@@ -6,8 +6,10 @@ package etu2023.framework.servlet;
  */
 
 import etu2023.framework.Mapping;
+import etu2023.framework.ModelView;
 import etu2023.framework.annotation.Annotation;
 import etu2023.framework.utils.Utils;
+import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -95,14 +97,25 @@ public class FrontServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
-            out.println("<h1>" +request.getRequestURI() + "</h1>");
+            out.println("<h1>" +request.getRequestURI   () + "</h1>");
             out.println("<h1>"+getNom(request, response) + "</h1>");
             
-            out.println("tiavina"); 
             Method m = getMethodFromUrl(getNom(request, response));
             Class c = getClass(getNom(request, response));
             Object o = m.invoke(c.newInstance(),null);
-            out.println("tiavina    ");
+            
+            if(o instanceof ModelView){
+                ModelView mv = (ModelView)o;
+<<<<<<< Updated upstream
+                RequestDispatcher dispather = request.getRequestDispatcher(mv.getView());
+                dispather.forward(request, response);
+            }
+=======
+                RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
+                rd.forward(request, response);
+            }
+            
+>>>>>>> Stashed changes
 //            out.println(getMappingUrls().size());
             for (Map.Entry<String, Mapping> entry : MappingUrls.entrySet()) {
                 Object key = entry.getKey();
