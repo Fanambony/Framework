@@ -29,6 +29,7 @@ public class Personne {
     public ModelView getPrenom() {
         System.out.println("Mon prenom");
         ModelView modelView = new ModelView("index.jsp");
+        modelView.addItem("prenom", this.getPrenom());
         return modelView;
     }
 
