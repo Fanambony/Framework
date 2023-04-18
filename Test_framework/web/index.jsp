@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<% Object[] ob = (Object[])request.getAttribute("value");%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,5 +14,9 @@
     </head>
     <body>
         <h1>Hello World!</h1>
+        
+        <% for(Object o : ob){%>
+        <label> <%= o.toString() %> </label>
+        <% } %>
     </body>
 </html>

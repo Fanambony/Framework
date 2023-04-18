@@ -28,8 +28,9 @@ public class Personne {
     @Annotation(value = "/prenom")
     public ModelView getPrenom() {
         System.out.println("Mon prenom");
+        Object[] o = new Object[]{"Benjamina"};
         ModelView modelView = new ModelView("index.jsp");
-        modelView.addItem("prenom", this.getPrenom());
+        modelView.addItem("value", o);
         return modelView;
     }
 
