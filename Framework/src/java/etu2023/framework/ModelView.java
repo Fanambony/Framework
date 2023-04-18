@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 public class ModelView {
     String View;
-    HashMap<String, Object> data;
+    HashMap<String, Object> data = new HashMap<String, Object>();
 
     public String getView() {
         return View;

@@ -220,7 +220,7 @@ public class FrontServlet extends HttpServlet {
         Mapping m = MappingUrls.get(key);
         ModelView mv = null;
         if(m != null){
-            String className = "etu2023.model."+m.getClassName();
+            String className = "etu2023.framework.model."+m.getClassName();
             Class c;
             c = Class.forName(className);
             mv = (ModelView)c.getDeclaredMethod(m.getMethod(), null).invoke(c.getConstructor(null).newInstance(), null);
