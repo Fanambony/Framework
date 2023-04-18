@@ -16,6 +16,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -199,5 +200,35 @@ public class FrontServlet extends HttpServlet {
             }
         }
         throw new Exception("Class not found");
+    }
+    
+    public ModelView getUrlDispatcher(String key) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+        Mapping m = MappingUrls.get(key);
+        ModelView mv = null;
+        if(m != null){
+            String className = "etu2023.model."+m.getClassName();
+            Class c;
+            c = Class.forName(className);
+            mv = (ModelView)c.getDeclaredMethod(m.getMethod(), null).invoke(c.getConstructor(null).newInstance(), null);
+        }
+        return mv;
+    }
+    
+    
+    public void loadView(String key, HttpServletRequest request, HttpServletResponse response) throws IOException{
+        try{
+            ModelView mv = getUrlDispatcher(key);
+            if(mv.getData().size() != 0){
+                for(Map.Entry<String, Object> entry : mv.getData().entrySet()) {
+                    String key1 = entry.getKey();
+                    Object value = entry.getValue();
+                    request.setAttribute(key1, value);
+                }
+            }
+            RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
+            rd.forward(request, response);
+        }catch(Exception e){
+            e.printStackTrace(response.getWriter());
+        }
     }
 }
