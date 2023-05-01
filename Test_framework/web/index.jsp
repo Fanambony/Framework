@@ -19,8 +19,8 @@
         <label> <%= o.toString() %> </label>
         <% } %>
         
-        <form action="saveAll" method="get">
-            Entrer votre nom:
+        <form action="saveAll" method="post">
+            Entrer votre prenom:
             <input type="text" name="prenom">
             <input type="submit" value="Valider">
         </form> 
