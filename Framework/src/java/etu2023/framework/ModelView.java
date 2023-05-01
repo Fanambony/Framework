@@ -20,24 +20,21 @@ public class ModelView {
     public HashMap<String, Object> getData() {
         return data;
     }
-    
 
     public void setView(String View) {
         this.View = View;
     }
-
     public void setData(HashMap<String, Object> data) {
         this.data = data;
     }
     
-
     public ModelView() {
     }
 
     public ModelView(String View) {
         this.View = View;
     }
-
+    
     public ModelView(String View, HashMap<String, Object> data) {
         this.View = View;
         this.data = data;

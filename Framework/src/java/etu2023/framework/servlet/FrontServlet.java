@@ -16,9 +16,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import static java.lang.Double.parseDouble;
+import static java.lang.Float.parseFloat;
+import static java.lang.Integer.parseInt;
+import static java.lang.System.out;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,6 +174,20 @@ public class FrontServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        
+        try{
+            PrintWriter out = response.getWriter();
+            
+            String[] url = getUrlArray(request);
+            Mapping m = MappingUrls.get(url[0]);
+            if(m != null){
+                getInput(url[0], request, response);
+            }else{
+                processRequest(request, response);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -218,7 +239,7 @@ public class FrontServlet extends HttpServlet {
     
     public ModelView getUrlDispatcher(String key) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
         Mapping m = MappingUrls.get(key);
-        ModelView mv = null;
+        ModelView mv = new ModelView();
         if(m != null){
             String className = "etu2023.framework.model."+m.getClassName();
             Class c;
@@ -243,5 +264,77 @@ public class FrontServlet extends HttpServlet {
         }catch(Exception e){
             e.printStackTrace(response.getWriter());
         }
+    }
+    
+    public String Maj(String mot){
+        if(mot.length() == 0 || mot == null){
+            return mot;
+        }
+        char PremierCaractere = Character.toUpperCase(mot.charAt(0));
+        return PremierCaractere + mot.substring(1);
+    }
+    
+    public double toDouble(String valeur){
+        return parseDouble(valeur);
+    }
+    
+    public int toInt(String valeur){
+        return parseInt(valeur);
+    }
+    
+    public float toFloat(String valeur){
+        return parseFloat(valeur);
+    }
+    
+    public Date toDate(String valeur){
+        return Date.valueOf(valeur);
+    }
+    
+    public void getInput(String s, HttpServletRequest request, HttpServletResponse response) throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+        PrintWriter pw = response.getWriter();
+        try{
+            Enumeration<String> allName = request.getParameterNames();
+            Mapping mp = MappingUrls.get(s);
+            String classe = "etu2023.framework.model." +mp.getClassName();
+            Class c = Class.forName(classe);
+            Object ob = c.getConstructor(null).newInstance(null);
+            out.println(mp.getMethod());
+            Method[] method = c.getDeclaredMethods();
+            
+            while(allName.hasMoreElements()){
+                String valeur = allName.nextElement();
+                String setter = Maj(valeur);
+                String value = request.getParameter(valeur);
+                String set = "set"+setter;
+                out.println("vita");
+                
+                for(Method m : method){
+                    out.println(m.getName());
+                    
+                    if(m.getName().equals(set)){
+                        if(Arrays.toString(m.getParameterTypes()).contains("String")) {
+                            m.invoke(ob, value);
+                        } else if(Arrays.toString(m.getParameterTypes()).contains("int")) {
+                            m.invoke(ob, toInt(value));
+                        } else if(Arrays.toString(m.getParameterTypes()).contains("double")) {
+                            m.invoke(ob, toDouble(value));
+                        } else if(Arrays.toString(m.getParameterTypes()).contains("float")) {
+                            m.invoke(ob, toFloat(value));
+                        } else if(Arrays.toString(m.getParameterTypes()).contains("Date") || Arrays.toString(m.getParameterTypes()).contains("Date")) {
+                            m.invoke(ob, toFloat(value));
+                        }
+                        break;
+                    }
+                }
+            }
+            out.println(mp.getMethod());
+            c.getDeclaredMethod(mp.getMethod(), null).invoke(ob, null);
+        }catch(Exception e){
+            e.printStackTrace(response.getWriter());
+        }
+    }
+
+    private String[] getUrlArray(HttpServletRequest request) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
