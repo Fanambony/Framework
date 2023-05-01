@@ -178,10 +178,10 @@ public class FrontServlet extends HttpServlet {
         try{
             PrintWriter out = response.getWriter();
             
-            String[] url = getUrlArray(request);
-            Mapping m = MappingUrls.get(url[0]);
+            String url = getNom(request, response);
+            Mapping m = MappingUrls.get(url);
             if(m != null){
-                getInput(url[0], request, response);
+                getInput(url, request, response);
             }else{
                 processRequest(request, response);
             }
@@ -249,11 +249,32 @@ public class FrontServlet extends HttpServlet {
         return mv;
     }
     
-    public void loadView(String key, HttpServletRequest request, HttpServletResponse response) throws IOException{
-        try{
+    //public void loadView(String key, HttpServletRequest request, HttpServletResponse response) throws IOException{
+    //    try{
+    //        ModelView mv = getUrlDispatcher(key);
+    //        if(mv.getData().size() != 0){
+    //            for(Map.Entry<String, Object> entry : mv.getData().entrySet()) {
+    //                String key1 = entry.getKey();
+    //                Object value = entry.getValue();
+    //                request.setAttribute(key1, value);
+    //            }
+    //        }
+    //        RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
+    //        rd.forward(request, response);
+    //    }catch(Exception e){
+    //        e.printStackTrace(response.getWriter());
+    //    }
+    //}
+    
+    public void loadView(String key, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
             ModelView mv = getUrlDispatcher(key);
-            if(mv.getData().size() != 0){
-                for(Map.Entry<String, Object> entry : mv.getData().entrySet()) {
+            if (mv == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Page not found");
+                return;
+            }
+            if (mv.getData().size() != 0) {
+                for (Map.Entry<String, Object> entry : mv.getData().entrySet()) {
                     String key1 = entry.getKey();
                     Object value = entry.getValue();
                     request.setAttribute(key1, value);
@@ -261,11 +282,11 @@ public class FrontServlet extends HttpServlet {
             }
             RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
             rd.forward(request, response);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace(response.getWriter());
         }
     }
-    
+
     public String Maj(String mot){
         if(mot.length() == 0 || mot == null){
             return mot;
@@ -320,8 +341,8 @@ public class FrontServlet extends HttpServlet {
                             m.invoke(ob, toDouble(value));
                         } else if(Arrays.toString(m.getParameterTypes()).contains("float")) {
                             m.invoke(ob, toFloat(value));
-                        } else if(Arrays.toString(m.getParameterTypes()).contains("Date") || Arrays.toString(m.getParameterTypes()).contains("Date")) {
-                            m.invoke(ob, toFloat(value));
+                        } else if(Arrays.toString(m.getParameterTypes()).contains("Date") || Arrays.toString(m.getParameterTypes()).contains("date")) {
+                            m.invoke(ob, toDate(value));
                         }
                         break;
                     }
@@ -332,9 +353,5 @@ public class FrontServlet extends HttpServlet {
         }catch(Exception e){
             e.printStackTrace(response.getWriter());
         }
-    }
-
-    private String[] getUrlArray(HttpServletRequest request) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
