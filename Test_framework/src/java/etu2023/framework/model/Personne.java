@@ -20,25 +20,28 @@ public class Personne {
     }
 
     @Annotation(value = "/nom")
-    public void setNom() {
-        this.nom = "Ramaroson";
-        System.out.println("Mon nom");
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
     @Annotation(value = "/prenom")
     public ModelView getPrenom() {
-        System.out.println("Mon prenom");
+        System.out.println("Voilaaaa");
         Object[] o = new Object[]{"Benjamina"};
         ModelView modelView = new ModelView("index.jsp");
         modelView.addItem("value", o);
         return modelView;
     }
 
-    public void setPrenom() {
-        this.prenom = "Benja";
-        System.out.println("Mon prenom");
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
     }
 
     public Personne() {
+    }
+    
+    @Annotation(value = "/saveAll")
+    public void save(){      
+        System.out.println(this.getPrenom());
     }
 }

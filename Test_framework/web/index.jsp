@@ -18,5 +18,12 @@
         <% for(Object o : ob){%>
         <label> <%= o.toString() %> </label>
         <% } %>
+        
+        <form action="saveAll" method="get">
+            Entrer votre nom:
+            <input type="text" name="prenom">
+            <input type="submit" value="Valider">
+        </form> 
+           
     </body>
 </html>
