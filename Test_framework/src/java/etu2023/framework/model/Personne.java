@@ -6,6 +6,7 @@ package etu2023.framework.model;
 
 import etu2023.framework.ModelView;
 import etu2023.framework.annotation.Annotation;
+import java.sql.Date;
 
 /**
  *
@@ -14,6 +15,7 @@ import etu2023.framework.annotation.Annotation;
 public class Personne {
     String nom;
     String prenom;
+    Date dtn;
 
     public String getNom() {
         return nom;
@@ -24,13 +26,18 @@ public class Personne {
         this.nom = nom;
     }
 
+    public Date getDtn() {
+        return dtn;
+    }
+    
+    @Annotation(value = "/dtn")
+    public void setDtn(Date dtn) {
+        this.dtn = dtn;
+    }
+
     @Annotation(value = "/prenom")
-    public ModelView getPrenom() {
-        System.out.println("Voilaaaa");
-        Object[] o = new Object[]{"Benjamina"};
-        ModelView modelView = new ModelView("index.jsp");
-        modelView.addItem("value", o);
-        return modelView;
+    public String getPrenom() {
+        return prenom;
     }
 
     public void setPrenom(String prenom) {
@@ -40,8 +47,19 @@ public class Personne {
     public Personne() {
     }
     
-    @Annotation(value = "/saveAll")
-    public void save(){      
-        System.out.println(this.getPrenom());
+    @Annotation(value = "/findAll")
+    public ModelView findAll(){
+        Object[] o = new Object[]{"Benjamina"};
+        ModelView modelView = new ModelView("index.jsp");
+        modelView.addItem("value", o);
+        return modelView;
+    }
+    
+    @Annotation(value = "/save")
+    public ModelView save(){
+        Object[] o = new Object[]{this};
+        ModelView modelView = new ModelView("new.jsp");
+        modelView.addItem("personne", o);
+        return modelView;
     }
 }

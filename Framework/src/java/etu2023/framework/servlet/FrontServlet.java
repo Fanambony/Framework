@@ -149,7 +149,8 @@ public class FrontServlet extends HttpServlet {
             String url=getNom(request, response);
             Mapping mapping=MappingUrls.get(url);
             if(mapping!=null){
-                loadView(url, request, response);
+                ModelView mv = getInput(url, request, response);
+                loadView(mv, url, request, response);
             } 
             else{
                 processRequest(request, response);
@@ -173,20 +174,20 @@ public class FrontServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        //processRequest(request, response);
         
         try{
             PrintWriter out = response.getWriter();
             
             String url = getNom(request, response);
             Mapping m = MappingUrls.get(url);
-            if(m != null){
+            if(m!=null){
                 getInput(url, request, response);
             }else{
-                processRequest(request, response);
+                //processRequest(request, response);
             }
         } catch(Exception e){
-            e.printStackTrace();
+            e.getStackTrace();
         }
     }
 
@@ -212,9 +213,9 @@ public class FrontServlet extends HttpServlet {
         
         List<Class> lc = Utils.getClassFrom("etu2023.framework.model.");
         for (Class c : lc) {
-            if (c.getSimpleName() == getMappingUrls().get(url).getClassName()){
+            if (c.getSimpleName().equals(getMappingUrls().get(url).getClassName())){
                 for (Method m : c.getDeclaredMethods()) {
-                    if (m.getName() == getMappingUrls().get(url).getMethod()){
+                    if (m.getName().equals(getMappingUrls().get(url).getMethod())){
                         return m;
                     }
                 }
@@ -249,38 +250,19 @@ public class FrontServlet extends HttpServlet {
         return mv;
     }
     
-    //public void loadView(String key, HttpServletRequest request, HttpServletResponse response) throws IOException{
-    //    try{
-    //        ModelView mv = getUrlDispatcher(key);
-    //        if(mv.getData().size() != 0){
-    //            for(Map.Entry<String, Object> entry : mv.getData().entrySet()) {
-    //                String key1 = entry.getKey();
-    //                Object value = entry.getValue();
-    //                request.setAttribute(key1, value);
-    //            }
-    //        }
-    //        RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
-    //        rd.forward(request, response);
-    //    }catch(Exception e){
-    //        e.printStackTrace(response.getWriter());
-    //    }
-    //}
-    
-    public void loadView(String key, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void loadView(ModelView mv, String key, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            ModelView mv = getUrlDispatcher(key);
+//            ModelView mv = getUrlDispatcher(key);
+            RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
             if (mv == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Page not found");
                 return;
             }
-            if (mv.getData().size() != 0) {
-                for (Map.Entry<String, Object> entry : mv.getData().entrySet()) {
-                    String key1 = entry.getKey();
-                    Object value = entry.getValue();
-                    request.setAttribute(key1, value);
-                }
+            for (Map.Entry<String, Object> entry : mv.getData().entrySet()) {
+                String key1 = entry.getKey();
+                Object value = entry.getValue();
+                request.setAttribute(key1, value);
             }
-            RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
             rd.forward(request, response);
         } catch (Exception e) {
             e.printStackTrace(response.getWriter());
@@ -311,15 +293,16 @@ public class FrontServlet extends HttpServlet {
         return Date.valueOf(valeur);
     }
     
-    public void getInput(String s, HttpServletRequest request, HttpServletResponse response) throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+    public ModelView getInput(String s, HttpServletRequest request, HttpServletResponse response) throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
         PrintWriter pw = response.getWriter();
+        ModelView mv = null;
         try{
             Enumeration<String> allName = request.getParameterNames();
             Mapping mp = MappingUrls.get(s);
             String classe = "etu2023.framework.model." +mp.getClassName();
             Class c = Class.forName(classe);
             Object ob = c.getConstructor(null).newInstance(null);
-            out.println(mp.getMethod());
+            System.out.println(mp.getMethod());
             Method[] method = c.getDeclaredMethods();
             
             while(allName.hasMoreElements()){
@@ -327,7 +310,6 @@ public class FrontServlet extends HttpServlet {
                 String setter = Maj(valeur);
                 String value = request.getParameter(valeur);
                 String set = "set"+setter;
-                out.println("vita");
                 
                 for(Method m : method){
                     out.println(m.getName());
@@ -349,9 +331,10 @@ public class FrontServlet extends HttpServlet {
                 }
             }
             out.println(mp.getMethod());
-            c.getDeclaredMethod(mp.getMethod(), null).invoke(ob, null);
+            mv = (ModelView) c.getDeclaredMethod(mp.getMethod(), null).invoke(ob, null);
         }catch(Exception e){
             e.printStackTrace(response.getWriter());
         }
+        return mv;
     }
 }

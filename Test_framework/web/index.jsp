@@ -19,11 +19,12 @@
         <label> <%= o.toString() %> </label>
         <% } %>
         
-        <form action="saveAll" method="post">
-            Entrer votre prenom:
-            <input type="text" name="prenom">
+        <form action="save" method="get">
+            <p> Entrer votre nom: <input type="text" name="nom"> </p>
+            <p> Entrer votre prenom: <input type="text" name="prenom"> </p>
+            <p> Entrer votre prenom: <input type="date" name="prenom"> </p>
             <input type="submit" value="Valider">
-        </form> 
+        </form>
            
     </body>
 </html>
