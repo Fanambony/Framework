@@ -22,7 +22,6 @@
     <body>
         <h1>Liste</h1>
         <p> Votre nom est: <label> <%= personne.getNom() %> </label> </p>
-        <p> Votre prenom est: <label> <%= personne.getPrenom() %> </label> </p>        
-        <p> Votre prenom est: <label> <%= personne.getDtn() %> </label> </p>
+        <p> Votre prenom est: <label> <%= personne.getPrenom() %> </label> </p>
     </body>
 </html>
