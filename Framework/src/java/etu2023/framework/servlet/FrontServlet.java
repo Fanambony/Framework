@@ -174,20 +174,22 @@ public class FrontServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //processRequest(request, response);
-        
-        try{
+        try {
             PrintWriter out = response.getWriter();
-            
-            String url = getNom(request, response);
-            Mapping m = MappingUrls.get(url);
-            if(m!=null){
-                getInput(url, request, response);
-            }else{
-                //processRequest(request, response);
+            String url=getNom(request, response);
+            Mapping mapping=MappingUrls.get(url);
+            if(mapping!=null){
+                ModelView mv = getInput(url, request, response);
+                loadView(mv, url, request, response);
+            } 
+            else{
+                processRequest(request, response);
             }
-        } catch(Exception e){
-            e.getStackTrace();
+            out.println(request.getParameterMap().keySet());
+            out.close();
+        } 
+        catch (Exception ex) {
+            ex.getStackTrace();
         }
     }
 
