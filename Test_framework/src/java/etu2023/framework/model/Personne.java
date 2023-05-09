@@ -21,7 +21,6 @@ public class Personne {
         return nom;
     }
 
-    @Annotation(value = "/nom")
     public void setNom(String nom) {
         this.nom = nom;
     }
@@ -30,12 +29,10 @@ public class Personne {
         return dtn;
     }
     
-    @Annotation(value = "/dtn")
     public void setDtn(Date dtn) {
         this.dtn = dtn;
     }
 
-    @Annotation(value = "/prenom")
     public String getPrenom() {
         return prenom;
     }
