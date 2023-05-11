@@ -53,7 +53,7 @@ public class Personne {
     }
     
     @Annotation(value = "/save")
-    public ModelView save(){
+    public ModelView save(String nom, String prenom, Date dtn){
         Object[] o = new Object[]{this};
         ModelView modelView = new ModelView("new.jsp");
         modelView.addItem("personne", o);

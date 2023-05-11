@@ -22,6 +22,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.System.out;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,7 +151,7 @@ public class FrontServlet extends HttpServlet {
             Mapping mapping=MappingUrls.get(url);
             if(mapping!=null){
                 ModelView mv = getInput(url, request, response);
-                loadView(mv, url, request, response);
+                loadView(mv, request, response);
             } 
             else{
                 processRequest(request, response);
@@ -180,7 +181,7 @@ public class FrontServlet extends HttpServlet {
             Mapping mapping=MappingUrls.get(url);
             if(mapping!=null){
                 ModelView mv = getInput(url, request, response);
-                loadView(mv, url, request, response);
+                loadView(mv, request, response);
             } 
             else{
                 processRequest(request, response);
@@ -252,9 +253,8 @@ public class FrontServlet extends HttpServlet {
         return mv;
     }
     
-    public void loadView(ModelView mv, String key, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void loadView(ModelView mv, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-//            ModelView mv = getUrlDispatcher(key);
             RequestDispatcher rd = request.getRequestDispatcher(mv.getView());
             if (mv == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Page not found");
@@ -305,32 +305,83 @@ public class FrontServlet extends HttpServlet {
             Class c = Class.forName(classe);
             Object ob = c.getConstructor(null).newInstance(null);
             System.out.println(mp.getMethod());
-            Method[] method = c.getDeclaredMethods();
+            Method[] methods = c.getDeclaredMethods();
             
-            while(allName.hasMoreElements()){
-                String valeur = allName.nextElement();
-                String setter = Maj(valeur);
-                String value = request.getParameter(valeur);
-                String set = "set"+setter;
-                
-                for(Method m : method){
-                    out.println(m.getName());
-                    
-                    if(m.getName().equals(set)){
-                        if(Arrays.toString(m.getParameterTypes()).contains("String")) {
-                            m.invoke(ob, value);
-                        } else if(Arrays.toString(m.getParameterTypes()).contains("int")) {
-                            m.invoke(ob, toInt(value));
-                        } else if(Arrays.toString(m.getParameterTypes()).contains("double")) {
-                            m.invoke(ob, toDouble(value));
-                        } else if(Arrays.toString(m.getParameterTypes()).contains("float")) {
-                            m.invoke(ob, toFloat(value));
-                        } else if(Arrays.toString(m.getParameterTypes()).contains("Date") || Arrays.toString(m.getParameterTypes()).contains("date")) {
-                            m.invoke(ob, toDate(value));
+            Method md = null;
+            for(Method method : methods){
+                if(method.getName().equals(mp.getMethod())){
+                    md = method;
+                    break;
+                }
+            }
+            Class<?>[] parameterTypes = md.getParameterTypes();
+            Parameter[] parameter = md.getParameters();
+            Object[] parameterValues = new Object[parameterTypes.length];
+            int paramCount = md.getParameterCount();
+            
+            if(paramCount == 0){
+                while(allName.hasMoreElements()){
+                    String valeur = allName.nextElement();
+                    String setter = Maj(valeur);
+                    String value = request.getParameter(valeur);
+                    String set = "set"+setter;
+
+                    for(Method m : methods){
+                        if(m.getName().equals(set)){
+                            if(Arrays.toString(m.getParameterTypes()).contains("String")) {
+                                m.invoke(ob, value);
+                            } else if(Arrays.toString(m.getParameterTypes()).contains("int")) {
+                                m.invoke(ob, toInt(value));
+                            } else if(Arrays.toString(m.getParameterTypes()).contains("double")) {
+                                m.invoke(ob, toDouble(value));
+                            } else if(Arrays.toString(m.getParameterTypes()).contains("float")) {
+                                m.invoke(ob, toFloat(value));
+                            } else if(Arrays.toString(m.getParameterTypes()).contains("Date") || Arrays.toString(m.getParameterTypes()).contains("date")) {
+                                m.invoke(ob, toDate(value));
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
+            }else{
+                String queryString = request.getQueryString();
+                String[] querySeparator = queryString.split("&");
+                for(int i = 0; i < querySeparator.length; i++){
+                    String[] paramSepar = querySeparator[i].split("=");
+                    String nom = paramSepar[0];
+                    String valeur = paramSepar[1];
+                    
+                    for(int j = 0; j < parameter.length; j++){
+                        String parameterName = parameter[j].getName();
+                        Class<?> parameterType = parameterTypes[j];
+                        if(parameterName.equalsIgnoreCase(nom)){
+                            if(parameterType==String.class) {
+                                parameterValues[j]= valeur;
+                            }else if(parameterType==int.class) {
+                                parameterValues[j]= toInt(valeur) ;
+                            }else if(parameterType==double.class) {
+                                parameterValues[j]= toDouble(valeur) ;
+                            }else if(parameterType==float.class){
+                                parameterValues[j]= toFloat(valeur) ;
+                            }else if(parameterType==Date.class) {
+                                parameterValues[j]= toDate(valeur) ;
+                            }
+                            break;
+                        }if(j == parameter.length-1){
+                            parameterValues[j] = null;
+                        }
+                    }
+                }
+            }
+            
+            
+            if(md.getReturnType() == ModelView.class){
+                if(paramCount == 0){
+                    ob = c.getDeclaredMethod(md.getName(), null).invoke(ob, null);
+                }else{
+                    ob = c.getDeclaredMethod(md.getName(), parameterTypes).invoke(ob, parameterValues);
+                }
+                loadView((ModelView)ob, request, response);
             }
             out.println(mp.getMethod());
             mv = (ModelView) c.getDeclaredMethod(mp.getMethod(), null).invoke(ob, null);
