@@ -43,6 +43,12 @@ public class Personne {
 
     public Personne() {
     }
+
+    public Personne(String nom, String prenom, Date dtn) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dtn = dtn;
+    }
     
     @Annotation(value = "/findAll")
     public ModelView findAll(){
@@ -54,7 +60,8 @@ public class Personne {
     
     @Annotation(value = "/save")
     public ModelView save(String nom, String prenom, Date dtn){
-        Object[] o = new Object[]{this};
+        Personne ob = new Personne(nom, prenom, dtn);
+        Object[] o = new Object[]{ob};
         ModelView modelView = new ModelView("new.jsp");
         modelView.addItem("personne", o);
         return modelView;
