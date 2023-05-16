@@ -351,6 +351,7 @@ public class FrontServlet extends HttpServlet {
                     String nom = paramSepar[0];
                     String valeur = paramSepar[1];
                     
+
                     for(int j = 0; j < parameter.length; j++){
                         String parameterName = parameter[j].getName();
                         Class<?> parameterType = parameterTypes[j];
@@ -383,8 +384,8 @@ public class FrontServlet extends HttpServlet {
                 }
                 loadView((ModelView)ob, request, response);
             }
-            out.println(mp.getMethod());
-            mv = (ModelView) c.getDeclaredMethod(mp.getMethod(), null).invoke(ob, null);
+            //out.println(mp.getMethod());
+            //mv = (ModelView) c.getDeclaredMethod(mp.getMethod(), null).invoke(ob, null);
         }catch(Exception e){
             e.printStackTrace(response.getWriter());
         }
