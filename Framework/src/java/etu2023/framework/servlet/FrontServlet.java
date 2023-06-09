@@ -338,9 +338,6 @@ public class FrontServlet extends HttpServlet {
                                 m.invoke(ob, toFloat(value));
                             } else if(Arrays.toString(m.getParameterTypes()).contains("Date") || Arrays.toString(m.getParameterTypes()).contains("date")) {
                                 m.invoke(ob, toDate(value));
-                            } else if(Arrays.toString(m.getParameterTypes()).contains("String[]")) {
-                                String[] values = request.getParameterValues(valeur);
-                                m.invoke(ob, (Object) values);
                             }
                             break;
                         }
@@ -369,9 +366,6 @@ public class FrontServlet extends HttpServlet {
                                 parameterValues[j]= toFloat(valeur) ;
                             }else if(parameterType==Date.class) {
                                 parameterValues[j]= toDate(valeur) ;
-                            } else if(parameterType == String[].class) {
-                                String[] values = request.getParameterValues(nom);
-                                parameterValues[j] = (Object) values;
                             }
                             break;
                         }if(j == parameter.length-1){
