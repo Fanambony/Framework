@@ -16,6 +16,7 @@ public class Personne {
     String nom;
     String prenom;
     Date dtn;
+    String[] langue;
 
     public String getNom() {
         return nom;
@@ -41,6 +42,21 @@ public class Personne {
         this.prenom = prenom;
     }
 
+    public String[] getLangue() {
+        return langue;
+    }
+
+    public void setLangue(String[] langue) {
+        this.langue = langue;
+    }
+
+    public Personne(String nom, String prenom, Date dtn, String[] langue) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dtn = dtn;
+        this.langue = langue;
+    }
+    
     public Personne() {
     }
 
@@ -59,8 +75,8 @@ public class Personne {
     }
     
     @Annotation(value = "/save")
-    public ModelView save(String nom, String prenom, Date dtn){
-        Personne ob = new Personne(nom, prenom, dtn);
+    public ModelView save(String nom, String prenom, Date dtn, String[] langue){
+        Personne ob = new Personne(nom, prenom, dtn, langue);
         Object[] o = new Object[]{ob};
         ModelView modelView = new ModelView("new.jsp");
         modelView.addItem("personne", o);

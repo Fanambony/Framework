@@ -23,6 +23,19 @@
             <p> Entrer votre nom: <input type="text" name="nom"> </p>
             <p> Entrer votre prenom: <input type="text" name="prenom"> </p>
             <p> Entrer votre date de naissance <input type="date" name="dtn"> </p>
+            <p> Choix de langue: </p>
+            <p> 
+                Anglais:
+                <input type="checkbox" name="langue" value="Anglais">
+            </p>
+            <p>
+                Malagasy:
+                <input type="checkbox" name="langue" value="Malagasy">
+            </p>
+            <p>
+                Anglais:
+                <input type="checkbox" name="langue" value="Anglais">
+            </p>
             <input type="submit" value="Valider">
         </form>
            
