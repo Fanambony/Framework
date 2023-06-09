@@ -19,10 +19,13 @@
         <label> <%= o.toString() %> </label>
         <% } %>
         
-        <form action="save" method="get">
+        <form action="save" method="get" enctype="multipart/form-data">
             <p> Entrer votre nom: <input type="text" name="nom"> </p>
             <p> Entrer votre prenom: <input type="text" name="prenom"> </p>
-            <p> Entrer votre date de naissance <input type="date" name="dtn"> </p>
+            <p> Entrer votre date de naissance: <input type="date" name="dtn"> </p>
+            
+            <input type="file" name="file">
+            
             <p> Choix de langue: </p>
             <p> 
                 Anglais:
@@ -33,9 +36,10 @@
                 <input type="checkbox" name="langue" value="Malagasy">
             </p>
             <p>
-                Anglais:
-                <input type="checkbox" name="langue" value="Anglais">
+                Francais
+                <input type="checkbox" name="langue" value="Francais">
             </p>
+            
             <input type="submit" value="Valider">
         </form>
            

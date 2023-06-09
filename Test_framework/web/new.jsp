@@ -9,7 +9,7 @@
 <% Object[] ob = (Object[])request.getAttribute("personne");%>
 <% Personne personne = null; %>
 <% for(int i = 0; i < ob.length; i++) { %>
-<% personne = (Personne)ob[i]; %>
+    <% personne = (Personne)ob[i]; %>
 <% } %>
 <%@ page import="java.util.HashMap" %>
 
@@ -32,5 +32,7 @@
             <li><%= langue %></li>
             <% } %>
         </ul>
+        
+        <p><%= personne.getFile() %></p>
     </body>
 </html>

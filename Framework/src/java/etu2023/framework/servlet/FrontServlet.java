@@ -7,6 +7,7 @@ package etu2023.framework.servlet;
 
 import etu2023.framework.Mapping;
 import etu2023.framework.ModelView;
+import etu2023.framework.UploadFile;
 import etu2023.framework.annotation.Annotation;
 import etu2023.framework.utils.Utils;
 import jakarta.servlet.RequestDispatcher;
@@ -16,6 +17,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import java.io.InputStream;
 import static java.lang.Double.parseDouble;
 import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
@@ -26,6 +29,7 @@ import java.lang.reflect.Parameter;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -48,25 +52,28 @@ public class FrontServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     HashMap<String, Mapping> MappingUrls;
-    
     private ArrayList<Class> classList = new ArrayList<>();
+    private HashMap<String, Object> Singleton;
 
     public ArrayList<Class> getClassList() {
         return classList;
     }
-
     public void setClassList(ArrayList<Class> classList) {
         this.classList = classList;
     }
     
-    
-    
     public HashMap<String, Mapping> getMappingUrls() {
         return MappingUrls;
     }
-
     public void setMappingUrls(HashMap<String, Mapping> MappingUrls) {
         this.MappingUrls = MappingUrls;
+    }
+
+    public HashMap<String, Object> getSingleton() {
+        return Singleton;
+    }
+    public void setSingleton(HashMap<String, Object> Singleton) {
+        this.Singleton = Singleton;
     }
     
     public void setMappingUrls(String path) {
@@ -341,7 +348,7 @@ public class FrontServlet extends HttpServlet {
                             }else if(Arrays.toString(m.getParameterTypes()).contains("String[]")) {
                                 String[] values = request.getParameterValues(valeur);
                                 m.invoke(ob, (Object) values);
-                            }
+                            } 
                             break;
                         }
                     }
@@ -361,17 +368,24 @@ public class FrontServlet extends HttpServlet {
                         if(parameterName.equalsIgnoreCase(nom)){
                             if(parameterType==String.class) {
                                 parameterValues[j]= valeur;
-                            }else if(parameterType==int.class) {
+                            } else if(parameterType==int.class) {
                                 parameterValues[j]= toInt(valeur) ;
-                            }else if(parameterType==double.class) {
+                            } else if(parameterType==double.class) {
                                 parameterValues[j]= toDouble(valeur) ;
-                            }else if(parameterType==float.class){
+                            } else if(parameterType==float.class){
                                 parameterValues[j]= toFloat(valeur) ;
-                            }else if(parameterType==Date.class) {
+                            } else if(parameterType==Date.class) {
                                 parameterValues[j]= toDate(valeur) ;
                             } else if(parameterType == String[].class) {
                                 String[] values = request.getParameterValues(nom);
                                 parameterValues[j] = (Object) values;
+                            } else if(parameterType == UploadFile.class) {
+                                UploadFile uploadFile = new UploadFile();
+                                //setUploadedFile(request, nom, uploadFile);
+                                //parameterValues[j] = uploadFile;
+                                Part file = getPart(request, nom);
+                                uploadFile.setFileName(UploadFile.getFileName(file));
+                                parameterValues[j] = uploadFile;
                             }
                             break;
                         }if(j == parameter.length-1){
@@ -390,11 +404,30 @@ public class FrontServlet extends HttpServlet {
                 }
                 loadView((ModelView)ob, request, response);
             }
-            //out.println(mp.getMethod());
-            //mv = (ModelView) c.getDeclaredMethod(mp.getMethod(), null).invoke(ob, null);
         }catch(Exception e){
             e.printStackTrace(response.getWriter());
         }
         return mv;
+    }
+    
+    public void setUploadedFile(HttpServletRequest request, String paramName, UploadFile uploadFile) throws IOException, ServletException {
+        Part filePart = request.getPart(paramName);
+        if (filePart != null) {
+            String fileName = uploadFile.getFileName(filePart);
+            byte[] fileBytes = uploadFile.getFileBytes(filePart);
+
+            uploadFile.setFileName(fileName);
+            uploadFile.setBytes(fileBytes);
+        }
+    }
+    
+    public Part getPart(HttpServletRequest request, String key) throws Exception{
+        Collection<Part> collection = request.getParts();
+        for(Part part : collection){
+            if(part.getName().equals(key)) {
+                return part;
+            }
+        }
+        throw new Exception("Not exist");
     }
 }

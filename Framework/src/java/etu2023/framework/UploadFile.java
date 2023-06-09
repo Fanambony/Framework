@@ -4,6 +4,13 @@
  */
 package etu2023.framework;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  *
  * @author Benji
@@ -11,7 +18,7 @@ package etu2023.framework;
 public class UploadFile {
     String fileName;
     String path;
-    Byte[] bytes;
+    byte[] bytes;
 
     public String getFileName() {
         return fileName;
@@ -29,15 +36,15 @@ public class UploadFile {
         this.path = path;
     }
 
-    public Byte[] getBytes() {
+    public byte[] getBytes() {
         return bytes;
     }
 
-    public void setBytes(Byte[] bytes) {
+    public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
 
-    public UploadFile(String fileName, String path, Byte[] bytes) {
+    public UploadFile(String fileName, String path, byte[] bytes) {
         this.fileName = fileName;
         this.path = path;
         this.bytes = bytes;
@@ -45,4 +52,44 @@ public class UploadFile {
 
     public UploadFile() {
     }   
+    
+    public static String getFileName(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        String[] elements = contentDisposition.split(";");
+        for (String element : elements) {
+            if (element.trim().startsWith("filename")) {
+                return element.substring(element.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+
+        return null;
+    }
+
+    public byte[] getFileBytes(Part part) throws IOException {
+        InputStream inputStream = part.getInputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+
+        return outputStream.toByteArray();
+    }
+    
+    public UploadFile getUploadedFile(HttpServletRequest request, String paramName) throws IOException, ServletException {
+        Part filePart = request.getPart(paramName);
+        if (filePart != null) {
+            String fileName = getFileName(filePart);
+            byte[] fileBytes = getFileBytes(filePart);
+
+            UploadFile uploadFile = new UploadFile();
+            uploadFile.setFileName(fileName);
+            uploadFile.setBytes(bytes);
+
+            return uploadFile;
+        }
+
+        return null;
+    }
 }

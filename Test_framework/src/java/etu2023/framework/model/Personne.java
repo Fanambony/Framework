@@ -76,10 +76,10 @@ public class Personne {
     
     @Annotation(value = "/save")
     public ModelView save(String nom, String prenom, Date dtn, String[] langue){
-        Personne ob = new Personne(nom, prenom, dtn, langue);
+        Personne ob = new Personne(nom, prenom, dtn, langue, file);
         Object[] o = new Object[]{ob};
         ModelView modelView = new ModelView("new.jsp");
         modelView.addItem("personne", o);
         return modelView;
     }
-}
+}   
