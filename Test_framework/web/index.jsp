@@ -22,7 +22,7 @@
         <form action="save" method="get">
             <p> Entrer votre nom: <input type="text" name="nom"> </p>
             <p> Entrer votre prenom: <input type="text" name="prenom"> </p>
-            <p> Entrer votre date de naissance: <input type="date" name="dtn"> </p>
+            <p> Entrer votre date de naissance <input type="date" name="dtn"> </p>
             <p> Choix de langue: </p>
             <p> 
                 Anglais:
