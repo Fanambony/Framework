@@ -5,6 +5,7 @@
 package etu2023.framework.model;
 
 import etu2023.framework.ModelView;
+import etu2023.framework.UploadFile;
 import etu2023.framework.annotation.Annotation;
 import java.sql.Date;
 
@@ -16,6 +17,8 @@ public class Personne {
     String nom;
     String prenom;
     Date dtn;
+    String[] langue;
+    UploadFile file;
 
     public String getNom() {
         return nom;
@@ -41,13 +44,51 @@ public class Personne {
         this.prenom = prenom;
     }
 
+    public UploadFile getFile() {
+        return file;
+    }
+
+    public void setFile(UploadFile file) {
+        this.file = file;
+    }
+
+    public String[] getLangue() {
+        return langue;
+    }
+
+    public void setLangue(String[] langue) {
+        this.langue = langue;
+    }
+
+    public Personne(String nom, String prenom, Date dtn, String[] langue, UploadFile file) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dtn = dtn;
+        this.langue = langue;
+        this.file = file;
+    }
+    
     public Personne() {
+    }
+
+    public Personne(String nom, String prenom, Date dtn, UploadFile file) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dtn = dtn;
+        this.file = file;
     }
 
     public Personne(String nom, String prenom, Date dtn) {
         this.nom = nom;
         this.prenom = prenom;
         this.dtn = dtn;
+    }
+
+    public Personne(String nom, String prenom, Date dtn, String[] langue) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dtn = dtn;
+        this.langue = langue;
     }
     
     @Annotation(value = "/findAll")
@@ -59,8 +100,8 @@ public class Personne {
     }
     
     @Annotation(value = "/save")
-    public ModelView save(String nom, String prenom, Date dtn){
-        Personne ob = new Personne(nom, prenom, dtn);
+    public ModelView save(String nom, String prenom, Date dtn, String[] langue){
+        Personne ob = new Personne(nom, prenom, dtn, langue);
         Object[] o = new Object[]{ob};
         ModelView modelView = new ModelView("new.jsp");
         modelView.addItem("personne", o);

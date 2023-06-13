@@ -24,5 +24,13 @@
         <p> Votre nom est: <label> <%= personne.getNom() %> </label> </p>
         <p> Votre prenom est: <label> <%= personne.getPrenom() %> </label> </p>
         <p> Votre dtn est: <label> <%= personne.getDtn() %> </label> </p>
+        
+        <p> Vos langues sélectionnées sont: </p>
+        <% String[] langues = personne.getLangue(); %>
+        <ul>
+            <% for (String langue : langues) { %>
+            <li><%= langue %></li>
+            <% } %>
+        </ul>
     </body>
 </html>
