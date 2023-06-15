@@ -6,6 +6,7 @@ package etu2023.framework.model;
 
 import etu2023.framework.ModelView;
 import etu2023.framework.annotation.Annotation;
+import etu2023.framework.annotation.Auth;
 import java.sql.Date;
 
 /**
@@ -65,7 +66,8 @@ public class Personne {
         this.dtn = dtn;
         this.langue = langue;
     }
-    
+  
+    @Auth(value = "")
     @Annotation(value = "/findAll")
     public ModelView findAll(){
         Object[] o = new Object[]{"Benjamina"};
@@ -81,5 +83,13 @@ public class Personne {
         ModelView modelView = new ModelView("new.jsp");
         modelView.addItem("personne", o);
         return modelView;
+    }
+    
+    @Annotation(value = "/login")
+    public ModelView login() {
+        ModelView mv = new ModelView("Login.jsp");
+        mv.addSession("profil", "admin");
+        mv.addSession("isconnected", "true");
+        return mv;
     }
 }

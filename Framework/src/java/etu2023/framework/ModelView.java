@@ -13,6 +13,7 @@ import java.util.HashMap;
 public class ModelView {
     String View;
     HashMap<String, Object> data = new HashMap<String, Object>();
+    private HashMap<String, Object> session = new HashMap<>();
 
     public String getView() {
         return View;
@@ -26,6 +27,18 @@ public class ModelView {
     }
     public void setData(HashMap<String, Object> data) {
         this.data = data;
+    }
+
+    public HashMap<String, Object> getSession() {
+        return session;
+    }
+
+    public void setSession(HashMap<String, Object> session) {
+        this.session = session;
+    }
+    
+    public void addSession(String key, Object value) {
+        getSession().put(key, value);
     }
     
     public ModelView() {

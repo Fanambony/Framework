@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class Utils {
     public static List<Class> getClassFrom(String packages) throws Exception{
-        String path = packages.replaceAll("[.]", "/");
+        String path = packages.replaceAll("[.]", "\\\\");
         URL packagesUrl = Thread.currentThread().getContextClassLoader().getResource(path);
         File packDir = new File(packagesUrl.toURI());
         File[] inside = packDir.listFiles();
