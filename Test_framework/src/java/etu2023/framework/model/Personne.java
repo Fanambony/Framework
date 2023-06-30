@@ -5,6 +5,7 @@
 package etu2023.framework.model;
 
 import etu2023.framework.ModelView;
+import etu2023.framework.UploadFile;
 import etu2023.framework.annotation.Annotation;
 import etu2023.framework.annotation.Auth;
 import java.sql.Date;
@@ -18,6 +19,7 @@ public class Personne {
     String prenom;
     Date dtn;
     String[] langue;
+    UploadFile file;
 
     public String getNom() {
         return nom;
@@ -65,6 +67,14 @@ public class Personne {
         this.prenom = prenom;
         this.dtn = dtn;
         this.langue = langue;
+    }
+
+    public Personne(String nom, String prenom, Date dtn, String[] langue, UploadFile file) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dtn = dtn;
+        this.langue = langue;
+        this.file = file;
     }
   
     @Auth(value = "")
