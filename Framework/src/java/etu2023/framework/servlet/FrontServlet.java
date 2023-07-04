@@ -5,6 +5,7 @@ package etu2023.framework.servlet;
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
+import com.google.gson.Gson;
 import etu2023.framework.Mapping;
 import etu2023.framework.ModelView;
 import etu2023.framework.UploadFile;
@@ -111,7 +112,7 @@ public class FrontServlet extends HttpServlet {
                 getClassList().add(c);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
         }
     }
     
@@ -161,7 +162,7 @@ public class FrontServlet extends HttpServlet {
             out.println("</html>");
             
         }catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
         }
     }
 
@@ -303,9 +304,13 @@ public class FrontServlet extends HttpServlet {
                 Object value = entry.getValue();
                 request.getSession().setAttribute(key1, value);
             }
-            rd.forward(request, response);
+            if(mv.getIsJson()) {
+                response.getWriter().println(new Gson().toJson(mv.getData()));
+            } else {
+                rd.forward(request, response);
+            }
         } catch (Exception e) {
-            e.printStackTrace(response.getWriter());
+            //e.printStackTrace(response.getWriter());
         }
     }
 
@@ -343,7 +348,6 @@ public class FrontServlet extends HttpServlet {
             Class c = Class.forName(classe);
             Object ob = traitementSingleton(c);
             
-            System.out.println(mp.getMethod());
             Method[] methods = c.getDeclaredMethods();
             
             Method md = null;
@@ -381,7 +385,6 @@ public class FrontServlet extends HttpServlet {
                                 String[] values = request.getParameterValues(valeur);
                                 m.invoke(ob, (Object) values);
                             } else {
-                                System.out.println("//////////////////////");
                             }
                             break;
                         }
@@ -414,7 +417,6 @@ public class FrontServlet extends HttpServlet {
                                 String[] values = request.getParameterValues(nom);
                                 parameterValues[j] = (Object) values;
                             } else {
-                                System.out.println("file   +++++++++++++++++++++++");
                                 UploadFile uploadFile = new UploadFile();
                                 //setUploadedFile(request, nom, uploadFile);
                                 //parameterValues[j] = uploadFile;
@@ -443,7 +445,7 @@ public class FrontServlet extends HttpServlet {
             }
             return mv;
         }catch(Exception e){
-            e.printStackTrace(response.getWriter());
+            //e.printStackTrace(response.getWriter());
         }
         return mv;
     }
