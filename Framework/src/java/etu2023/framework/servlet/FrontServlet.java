@@ -22,11 +22,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-import java.io.InputStream;
 import static java.lang.Double.parseDouble;
 import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
-import static java.lang.System.out;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -34,6 +32,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -350,6 +349,8 @@ public class FrontServlet extends HttpServlet {
             
             Method[] methods = c.getDeclaredMethods();
             
+            traitementSession(request, ob);
+            
             Method md = null;
             for(Method method : methods){
                 if(method.getName().equals(mp.getMethod())){
@@ -432,16 +433,16 @@ public class FrontServlet extends HttpServlet {
                 }
             }
             
-            
+            Object objet = null;
             if(md.getReturnType() == ModelView.class){
                 if(paramCount == 0){
                     if (!traitementAuth(request, md)) throw new Exception("AUTH");
-                    ob = c.getDeclaredMethod(md.getName(), null).invoke(ob, null);
+                    objet = c.getDeclaredMethod(md.getName(), null).invoke(ob, null);
                 }else{
                     if (!traitementAuth(request, md)) throw new Exception("AUTH");
-                    ob = c.getDeclaredMethod(md.getName(), parameterTypes).invoke(ob, parameterValues);
+                    objet = c.getDeclaredMethod(md.getName(), parameterTypes).invoke(ob, parameterValues);
                 }
-                loadView((ModelView)ob, request, response);
+                loadView((ModelView)objet, request, response);
             }
             return mv;
         }catch(Exception e){
@@ -503,5 +504,16 @@ public class FrontServlet extends HttpServlet {
             }*/
         }
         return true;
+    }
+    
+    public void traitementSession(HttpServletRequest request, Object ob) throws Exception {
+        HashMap<String, Object> session = new HashMap<>();
+        HttpSession hs = request.getSession();
+        List<String> liste = Collections.list(hs.getAttributeNames());
+        Method m = ob.getClass().getDeclaredMethod("setSession", HashMap.class);
+        for(String s:liste){
+            session.put(s, hs.getAttribute(s));
+        }
+        m.invoke(ob, session);
     }
 }
