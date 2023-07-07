@@ -450,6 +450,11 @@ public class FrontServlet extends HttpServlet {
                 }else {
                     loadView((ModelView)ob, request, response);
                 }
+                if(mv.isInvalidateSession()) {
+                    this.deleteSession(request, mv);
+                    RequestDispatcher d = request.getRequestDispatcher(mv.getView());
+                    d.forward(request, response);
+                }
                 
             }
             return mv;
@@ -530,5 +535,15 @@ public class FrontServlet extends HttpServlet {
             return true;
         }
         return false;
+    }
+    
+    public void deleteSession(HttpServletRequest request, ModelView view) {
+        HttpSession session = request.getSession();
+        for(String s: view.getDeleteSession()) {
+            session.removeAttribute(s);
+        }
+        if(view.isInvalidateSession()) {
+            session.invalidate();
+        }
     }
 }
