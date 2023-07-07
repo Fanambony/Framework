@@ -6,6 +6,7 @@ package etu2023.framework.utils;
 
 import etu2023.framework.Mapping;
 import etu2023.framework.annotation.Annotation;
+import etu2023.framework.annotation.Scope;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -41,5 +42,10 @@ public class Utils {
             }
         }
         return mappingUrls;
+    }
+    
+    public static boolean isSingleton(Class<?> c) {
+        Scope sc = c.getAnnotation(Scope.class);
+        return sc != null && "singleton".equals(sc.value());
     }
 }

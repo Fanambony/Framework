@@ -53,7 +53,7 @@ public class FrontServlet extends HttpServlet {
      */
     HashMap<String, Mapping> MappingUrls;
     private ArrayList<Class> classList = new ArrayList<>();
-    private HashMap<String, Object> Singleton;
+    private HashMap<String, Object> Singleton = new HashMap<>();
 
     public ArrayList<Class> getClassList() {
         return classList;
@@ -75,7 +75,7 @@ public class FrontServlet extends HttpServlet {
     public void setSingleton(HashMap<String, Object> Singleton) {
         this.Singleton = Singleton;
     }
-    
+
     public void setMappingUrls(String path) {
         try {
             List<Class> lc = Utils.getClassFrom(path);
@@ -104,7 +104,7 @@ public class FrontServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {                
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -115,7 +115,7 @@ public class FrontServlet extends HttpServlet {
             out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
             out.println("<h1>" +request.getRequestURI   () + "</h1>");
             out.println("<h1>"+getNom(request, response) + "</h1>");
-            
+           
             Method m = getMethodFromUrl(getNom(request, response));
             Class c = getClass(getNom(request, response));
             Object o = m.invoke(c.newInstance(),null);
@@ -125,14 +125,12 @@ public class FrontServlet extends HttpServlet {
                 RequestDispatcher dispather = request.getRequestDispatcher(mv.getView());
                 dispather.forward(request, response);
             }
-             
-//            out.println(getMappingUrls().size());
+            
             for (Map.Entry<String, Mapping> entry : MappingUrls.entrySet()) {
                 Object key = entry.getKey();
                 Object val = entry.getValue();
             }
-//            out.println(getMethodFromUrl(getNom(request, response)).getName());
-    
+              
             out.println("</body>");
             out.println("</html>");
             
@@ -159,8 +157,9 @@ public class FrontServlet extends HttpServlet {
             if(mapping!=null){
                 ModelView mv = getInput(url, request, response);
                 loadView(mv, request, response);
-            } 
-            else{
+//                Class c = getClass(getNom(request, response));
+                //Object singleton = traitementSingleton(c);
+            }else{
                 processRequest(request, response);
             }
             out.println(request.getParameterMap().keySet());
@@ -189,8 +188,9 @@ public class FrontServlet extends HttpServlet {
             if(mapping!=null){
                 ModelView mv = getInput(url, request, response);
                 loadView(mv, request, response);
-            } 
-            else{
+                //Class c = getClass(getNom(request, response));
+                //Object singleton = traitementSingleton(c);
+            }else {
                 processRequest(request, response);
             }
             out.println(request.getParameterMap().keySet());
@@ -310,7 +310,7 @@ public class FrontServlet extends HttpServlet {
             Mapping mp = MappingUrls.get(s);
             String classe = "etu2023.framework.model." +mp.getClassName();
             Class c = Class.forName(classe);
-            Object ob = c.getConstructor(null).newInstance(null);
+            Object ob = traitementSingleton(c);
             System.out.println(mp.getMethod());
             Method[] methods = c.getDeclaredMethods();
             
@@ -348,7 +348,9 @@ public class FrontServlet extends HttpServlet {
                             }else if(Arrays.toString(m.getParameterTypes()).contains("String[]")) {
                                 String[] values = request.getParameterValues(valeur);
                                 m.invoke(ob, (Object) values);
-                            } 
+                            } else {
+                                System.out.println("//////////////////////");
+                            }
                             break;
                         }
                     }
@@ -379,7 +381,8 @@ public class FrontServlet extends HttpServlet {
                             } else if(parameterType == String[].class) {
                                 String[] values = request.getParameterValues(nom);
                                 parameterValues[j] = (Object) values;
-                            } else if(parameterType == UploadFile.class) {
+                            } else {
+                                System.out.println("file   +++++++++++++++++++++++");
                                 UploadFile uploadFile = new UploadFile();
                                 //setUploadedFile(request, nom, uploadFile);
                                 //parameterValues[j] = uploadFile;
@@ -430,4 +433,14 @@ public class FrontServlet extends HttpServlet {
         }
         throw new Exception("Not exist");
     }
+    
+    public Object traitementSingleton(Class<?> clazz) throws InstantiationException, IllegalAccessException{
+        if(Utils.isSingleton(clazz)) {
+            if(!getSingleton().containsKey(clazz.getName())) {
+                getSingleton().put(clazz.getName(), clazz.newInstance());
+            }
+            return getSingleton().get(clazz.getName());
+        }
+        return clazz.newInstance();
+    } 
 }
