@@ -11,6 +11,7 @@ import etu2023.framework.ModelView;
 import etu2023.framework.UploadFile;
 import etu2023.framework.annotation.Annotation;
 import etu2023.framework.annotation.Auth;
+import etu2023.framework.annotation.RestAPI;
 import etu2023.framework.utils.Utils;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
@@ -25,6 +26,7 @@ import jakarta.servlet.http.Part;
 import static java.lang.Double.parseDouble;
 import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
+import static java.lang.System.out;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -443,6 +445,12 @@ public class FrontServlet extends HttpServlet {
                     objet = c.getDeclaredMethod(md.getName(), parameterTypes).invoke(ob, parameterValues);
                 }
                 loadView((ModelView)objet, request, response);
+                if(traitementJson(md) == true) {
+                    out.print(new Gson().toJson(ob));
+                }else {
+                    loadView((ModelView)ob, request, response);
+                }
+                
             }
             return mv;
         }catch(Exception e){
@@ -515,5 +523,12 @@ public class FrontServlet extends HttpServlet {
             session.put(s, hs.getAttribute(s));
         }
         m.invoke(ob, session);
+    }
+    public boolean traitementJson(Method m) {
+        RestAPI api = m.getAnnotation(RestAPI.class);
+        if(api != null) {
+            return true;
+        }
+        return false;
     }
 }

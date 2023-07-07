@@ -9,6 +9,7 @@ import etu2023.framework.UploadFile;
 import etu2023.framework.annotation.Annotation;
 import etu2023.framework.annotation.Auth;
 import etu2023.framework.annotation.Session;
+import etu2023.framework.annotation.RestAPI;
 import java.sql.Date;
 import java.util.HashMap;
 
@@ -95,7 +96,11 @@ public class Personne {
         this.langue = langue;
         this.file = file;
     }
-  
+
+    public Personne(String nom) {
+        this.nom = nom;
+    }
+    
     @Auth(value = "")
     @Annotation(value = "/findAll")
     public ModelView findAll(){
@@ -123,5 +128,12 @@ public class Personne {
         mv.addSession("profil", "admin");
         mv.addSession("isconnected", "true");
         return mv;
+    }
+    
+    @RestAPI(value = "")
+    @Annotation("/jack")
+    public Personne Name() {
+        Personne p = new Personne("Jack");
+        return p;
     }
 }
