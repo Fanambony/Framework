@@ -109,9 +109,10 @@ public class Personne {
     @Annotation(value = "/save")
     public ModelView save(String nom, String prenom, Date dtn, String[] langue){
         Personne ob = new Personne(nom, prenom, dtn, langue, file);
-        Object[] o = new Object[]{ob};
+        Object[] o = new Object[]{ob, this};
         ModelView modelView = new ModelView("new.jsp");
         modelView.addItem("personne", o);
+        modelView.setIsJson(true);
         System.out.println("the session is " + this.getSession());
         return modelView;
     }
