@@ -443,6 +443,17 @@ public class FrontServlet extends HttpServlet {
                     objet = c.getDeclaredMethod(md.getName(), parameterTypes).invoke(ob, parameterValues);
                 }
                 loadView((ModelView)objet, request, response);
+                if(traitementJson(md) == true) {
+                    out.print(new Gson().toJson(ob));
+                }else {
+                    loadView((ModelView)ob, request, response);
+                }
+                if(mv.isInvalidateSession()) {
+                    this.deleteSession(request, mv);
+                    RequestDispatcher d = request.getRequestDispatcher(mv.getView());
+                    d.forward(request, response);
+                }
+                
             }
             return mv;
         }catch(Exception e){
@@ -515,5 +526,22 @@ public class FrontServlet extends HttpServlet {
             session.put(s, hs.getAttribute(s));
         }
         m.invoke(ob, session);
+    }
+    public boolean traitementJson(Method m) {
+        RestAPI api = m.getAnnotation(RestAPI.class);
+        if(api != null) {
+            return true;
+        }
+        return false;
+    }
+    
+    public void deleteSession(HttpServletRequest request, ModelView view) {
+        HttpSession session = request.getSession();
+        for(String s: view.getDeleteSession()) {
+            session.removeAttribute(s);
+        }
+        if(view.isInvalidateSession()) {
+            session.invalidate();
+        }
     }
 }

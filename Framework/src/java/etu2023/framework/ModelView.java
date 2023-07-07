@@ -4,6 +4,7 @@
  */
 package etu2023.framework;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -15,6 +16,8 @@ public class ModelView {
     HashMap<String, Object> data = new HashMap<String, Object>();
     private HashMap<String, Object> session = new HashMap<>();
     private boolean isJson;
+    ArrayList<String> deleteSession = new ArrayList<>();
+    boolean invalidateSession = false;
 
     public String getView() {
         return View;
@@ -49,6 +52,24 @@ public class ModelView {
     public void setIsJson(boolean isJson) {
         this.isJson = isJson;
     }
+
+    public ArrayList<String> getDeleteSession() {
+        return deleteSession;
+    }
+
+    public void setDeleteSession(ArrayList<String> deleteSession) {
+        this.deleteSession = deleteSession;
+    }
+
+    public boolean isInvalidateSession() {
+        return invalidateSession;
+    }
+
+    public void setInvalidateSession(boolean invalidateSession) {
+        this.invalidateSession = invalidateSession;
+    }
+    
+    
 
     public ModelView(String View, boolean isJson) {
         this.View = View;
