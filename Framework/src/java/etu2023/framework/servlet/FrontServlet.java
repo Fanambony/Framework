@@ -9,14 +9,17 @@ import etu2023.framework.Mapping;
 import etu2023.framework.ModelView;
 import etu2023.framework.UploadFile;
 import etu2023.framework.annotation.Annotation;
+import etu2023.framework.annotation.Auth;
 import etu2023.framework.utils.Utils;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.InputStream;
 import static java.lang.Double.parseDouble;
@@ -54,6 +57,8 @@ public class FrontServlet extends HttpServlet {
     HashMap<String, Mapping> MappingUrls;
     private ArrayList<Class> classList = new ArrayList<>();
     private HashMap<String, Object> Singleton = new HashMap<>();
+    private String isConnected;
+    private String profile;
 
     public ArrayList<Class> getClassList() {
         return classList;
@@ -76,6 +81,22 @@ public class FrontServlet extends HttpServlet {
         this.Singleton = Singleton;
     }
 
+    public String getIsConnected() {
+        return isConnected;
+    }
+
+    public void setIsConnected(String isConnected) {
+        this.isConnected = isConnected;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
+    }
+    
     public void setMappingUrls(String path) {
         try {
             List<Class> lc = Utils.getClassFrom(path);
@@ -96,9 +117,14 @@ public class FrontServlet extends HttpServlet {
     
 
     @Override
-    public void init() throws ServletException {
-        super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-        setMappingUrls("etu2023.framework.model.");
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        String packageModel = this.getInitParameter("model-package");
+        setClassList(new ArrayList<>());
+        //setMappingUrls("etu2023.framework.model.");        
+        setMappingUrls(packageModel);
+        setIsConnected(config.getInitParameter("session-name-isconnected"));
+        setProfile(config.getInitParameter("session-name-profile"));
     }
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -272,6 +298,11 @@ public class FrontServlet extends HttpServlet {
                 Object value = entry.getValue();
                 request.setAttribute(key1, value);
             }
+            for (Map.Entry<String, Object> entry : mv.getSession().entrySet()) {
+                String key1 = entry.getKey();
+                Object value = entry.getValue();
+                request.getSession().setAttribute(key1, value);
+            }
             rd.forward(request, response);
         } catch (Exception e) {
             e.printStackTrace(response.getWriter());
@@ -311,6 +342,7 @@ public class FrontServlet extends HttpServlet {
             String classe = "etu2023.framework.model." +mp.getClassName();
             Class c = Class.forName(classe);
             Object ob = traitementSingleton(c);
+            
             System.out.println(mp.getMethod());
             Method[] methods = c.getDeclaredMethods();
             
@@ -401,12 +433,15 @@ public class FrontServlet extends HttpServlet {
             
             if(md.getReturnType() == ModelView.class){
                 if(paramCount == 0){
+                    if (!traitementAuth(request, md)) throw new Exception("AUTH");
                     ob = c.getDeclaredMethod(md.getName(), null).invoke(ob, null);
                 }else{
+                    if (!traitementAuth(request, md)) throw new Exception("AUTH");
                     ob = c.getDeclaredMethod(md.getName(), parameterTypes).invoke(ob, parameterValues);
                 }
                 loadView((ModelView)ob, request, response);
             }
+            return mv;
         }catch(Exception e){
             e.printStackTrace(response.getWriter());
         }
@@ -443,4 +478,28 @@ public class FrontServlet extends HttpServlet {
         }
         return clazz.newInstance();
     } 
+    
+    public boolean traitementAuth(HttpServletRequest request, Method m){
+        Auth a = m.getAnnotation(Auth.class);
+        if( a != null) {
+            HttpSession session = request.getSession();
+            String profil = (String) session.getAttribute(getProfile());
+            String connecter = (String) session.getAttribute(getIsConnected());
+            if(connecter != null) {
+                if(profil != null) {
+                    if(!a.value().equals("") && !a.value().equals(profil)) {
+                        return false;
+                    }
+                }
+            }else{
+                return false;
+            }
+            /*if(a.value().equals("")) {
+                return isConnected;
+            } else {
+                return isConnected && a.value().equals(profil);
+            }*/
+        }
+        return true;
+    }
 }
